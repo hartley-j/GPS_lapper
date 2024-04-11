@@ -45,7 +45,6 @@ unsigned long loopCounter;
 const unsigned long updateInterval = 1000;
 float frameRate = 0.0;
 
-
 void gpsLoop() {
     char c = GPS.read();
 
@@ -81,13 +80,13 @@ int getCurrentLap() {
 
 void setup() {
 
-#ifdef HAS_DEBUG
-    Serial.begin(115200);
-    delay(5000);
-    while (!Serial)
-        ;
-    debugln(F("Beginning debug mode of GPS module."));
-#endif
+    #ifdef HAS_DEBUG
+        Serial.begin(115200);
+        delay(5000);
+        while (!Serial)
+            ;
+        debugln(F("Beginning debug mode of GPS module."));
+    #endif
 
     GPS.begin(9600);
 
@@ -104,24 +103,24 @@ void setup() {
 
     debugln(F("Started GPS lap timer"));
 
-    startTime = millis();
-    loopCounter = 0;
+    // startTime = millis();
+    // loopCounter = 0;
 }
 
 void loop() {
-    loopCounter++;
-    endTime = millis();
+    // loopCounter++;
+    // endTime = millis();
 
-    // Check if the update interval has passed
-    if (endTime - startTime >= updateInterval)
-    {
-        // Calculate the frame rate (loops per second)
-        frameRate = (float)loopCounter / ((endTime - startTime) / 1000.0);
-        // Reset the loop counter and start time for the next interval
-        loopCounter = 0;
-        startTime = millis();
-    }
+    // // Check if the update interval has passed
+    // if (endTime - startTime >= updateInterval)
+    // {
+    //     // Calculate the frame rate (loops per second)
+    //     frameRate = (float)loopCounter / ((endTime - startTime) / 1000.0);
+    //     // Reset the loop counter and start time for the next interval
+    //     loopCounter = 0;
+    //     startTime = millis();
+    // }
 
-    currentMillis = millis();
+    // currentMillis = millis();
     gpsLoop();
 }

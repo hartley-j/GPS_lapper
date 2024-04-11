@@ -45,8 +45,41 @@ unsigned long loopCounter;
 const unsigned long updateInterval = 1000;
 float frameRate = 0.0;
 
-void setup()
-{
+
+void gpsLoop() {
+    char c = GPS.read();
+
+#ifdef HAS_DEBUG
+    debugWrite(c);
+#endif
+
+    if (GPS.newNMEAreceived() && GPS.parse(GPS.lastNMEA()))
+    {
+        if (GPS.fix)
+        {
+            lapTimer.updateCurrentTime(getGpsTimeInMilliseconds());
+            float altitude = GPS.altitude;
+            float speed = GPS.speed;
+            lapTimer.loop(GPS.latitudeDegrees, GPS.longitudeDegrees, altitude, speed);
+        }
+    }
+}
+
+unsigned long getGpsTimeInMilliseconds() {
+    unsigned long timeInMillis = 0;
+    timeInMillis += GPS.hour * 3600000ULL; // Convert hours to milliseconds
+    timeInMillis += GPS.minute * 60000ULL; // Convert minutes to milliseconds
+    timeInMillis += GPS.seconds * 1000ULL; // Convert seconds to milliseconds
+    timeInMillis += GPS.milliseconds;      // Add the milliseconds part
+
+    return timeInMillis;
+}
+
+int getCurrentLap() {
+    return lapTimer.getLaps();
+}
+
+void setup() {
 
 #ifdef HAS_DEBUG
     Serial.begin(115200);
@@ -75,8 +108,7 @@ void setup()
     loopCounter = 0;
 }
 
-void loop()
-{
+void loop() {
     loopCounter++;
     endTime = millis();
 
@@ -92,40 +124,4 @@ void loop()
 
     currentMillis = millis();
     gpsLoop();
-}
-
-void gpsLoop()
-{
-    char c = GPS.read();
-
-#ifdef HAS_DEBUG
-    debugWrite(c);
-#endif
-
-    if (GPS.newNMEAreceived() && GPS.parse(GPS.lastNMEA()))
-    {
-        if (GPS.fix)
-        {
-            lapTimer.updateCurrentTime(getGpsTimeInMilliseconds());
-            float altitude = GPS.altitude;
-            float speed = GPS.speed;
-            lapTimer.loop(GPS.latitudeDegrees, GPS.longitudeDegrees, altitude, speed);
-        }
-    }
-}
-
-unsigned long getGpsTimeInMilliseconds()
-{
-    unsigned long timeInMillis = 0;
-    timeInMillis += GPS.hour * 3600000ULL; // Convert hours to milliseconds
-    timeInMillis += GPS.minute * 60000ULL; // Convert minutes to milliseconds
-    timeInMillis += GPS.seconds * 1000ULL; // Convert seconds to milliseconds
-    timeInMillis += GPS.milliseconds;      // Add the milliseconds part
-
-    return timeInMillis;
-}
-
-int getCurrentLap()
-{
-    return lapTimer.getLaps();
 }

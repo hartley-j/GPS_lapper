@@ -8,23 +8,23 @@
 #define DEBUG_SERIAL Serial
 
 #ifdef HAS_DEBUG
-#define debugln DEBUG_SERIAL.println
-#define debug DEBUG_SERIAL.print
-#define debugWrite DEBUG_SERIAL.write
+    #define debugln DEBUG_SERIAL.println
+    #define debug DEBUG_SERIAL.print
+    #define debugWrite DEBUG_SERIAL.write
 #else
-void dummy_debug(...) {}
-#define debug dummy_debug
-#define debugln dummy_debug
-#define debugWrite dummy_debug
+    void dummy_debug(...) {}
+    #define debug dummy_debug
+    #define debugln dummy_debug
+    #define debugWrite dummy_debug
 #endif
 
 // comment out if not using software serial with RX, TX on pins 9, 8
 #define USING_SOFTWARE_SERIAL
 
 #ifdef USING_SOFTWARE_SERIAL
-SoftwareSerial gps_serial(9, 8);
+    SoftwareSerial gps_serial(9, 8);
 #else
-Serial1 gps_serial;
+    Serial1 gps_serial;
 #endif
 Adafruit_GPS GPS(&gps_serial);
 
@@ -58,9 +58,9 @@ unsigned long getGpsTimeInMilliseconds() {
 void gpsLoop() {
     char c = GPS.read();
 
-#ifdef HAS_DEBUG
-    debugWrite(c);
-#endif
+    #ifdef HAS_DEBUG
+        debugWrite(c);
+    #endif
 
     if (GPS.newNMEAreceived() && GPS.parse(GPS.lastNMEA()))
     {
@@ -83,8 +83,7 @@ void setup() {
     #ifdef HAS_DEBUG
         Serial.begin(115200);
         delay(5000);
-        while (!Serial)
-            ;
+        while (!Serial);
         debugln(F("Beginning debug mode of GPS module."));
     #endif
 

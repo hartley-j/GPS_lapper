@@ -45,6 +45,16 @@ unsigned long loopCounter;
 const unsigned long updateInterval = 1000;
 float frameRate = 0.0;
 
+unsigned long getGpsTimeInMilliseconds() {
+    unsigned long timeInMillis = 0;
+    timeInMillis += GPS.hour * 3600000ULL; // Convert hours to milliseconds
+    timeInMillis += GPS.minute * 60000ULL; // Convert minutes to milliseconds
+    timeInMillis += GPS.seconds * 1000ULL; // Convert seconds to milliseconds
+    timeInMillis += GPS.milliseconds;      // Add the milliseconds part
+
+    return timeInMillis;
+}
+
 void gpsLoop() {
     char c = GPS.read();
 
@@ -62,16 +72,6 @@ void gpsLoop() {
             lapTimer.loop(GPS.latitudeDegrees, GPS.longitudeDegrees, altitude, speed);
         }
     }
-}
-
-unsigned long getGpsTimeInMilliseconds() {
-    unsigned long timeInMillis = 0;
-    timeInMillis += GPS.hour * 3600000ULL; // Convert hours to milliseconds
-    timeInMillis += GPS.minute * 60000ULL; // Convert minutes to milliseconds
-    timeInMillis += GPS.seconds * 1000ULL; // Convert seconds to milliseconds
-    timeInMillis += GPS.milliseconds;      // Add the milliseconds part
-
-    return timeInMillis;
 }
 
 int getCurrentLap() {

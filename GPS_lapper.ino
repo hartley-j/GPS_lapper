@@ -8,23 +8,23 @@
 #define DEBUG_SERIAL Serial
 
 #ifdef HAS_DEBUG
-    #define debugln DEBUG_SERIAL.println
-    #define debug DEBUG_SERIAL.print
-    #define debugWrite DEBUG_SERIAL.write
+#define debugln DEBUG_SERIAL.println
+#define debug DEBUG_SERIAL.print
+#define debugWrite DEBUG_SERIAL.write
 #else
-  void dummy_debug(...) {}
-  #define debug dummy_debug
-  #define debugln dummy_debug
-  #define debugWrite dummy_debug
+void dummy_debug(...) {}
+#define debug dummy_debug
+#define debugln dummy_debug
+#define debugWrite dummy_debug
 #endif
 
 // comment out if not using software serial with RX, TX on pins 9, 8
 #define USING_SOFTWARE_SERIAL
 
 #ifdef USING_SOFTWARE_SERIAL
-    SoftwareSerial gps_serial(9, 8);
+SoftwareSerial gps_serial(9, 8);
 #else
-    Serial1 gps_serial;
+Serial1 gps_serial;
 #endif
 Adafruit_GPS GPS(&gps_serial);
 
@@ -45,20 +45,22 @@ unsigned long loopCounter;
 const unsigned long updateInterval = 1000;
 float frameRate = 0.0;
 
-void setup() {
+void setup()
+{
 
-    #ifdef HAS_DEBUG
-        Serial.begin(115200);
-        delay(5000);
-        while(!Serial);
-        debugln(F("Beginning debug mode of GPS module."));
-    #endif
+#ifdef HAS_DEBUG
+    Serial.begin(115200);
+    delay(5000);
+    while (!Serial)
+        ;
+    debugln(F("Beginning debug mode of GPS module."));
+#endif
 
     GPS.begin(9600);
-    
+
     // We only need RMC data (coords and such) so send this command:
     GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
-    
+
     // Set the update rate to 5 Hz
     GPS.sendCommand(PMTK_SET_NMEA_UPDATE_5HZ);
     delay(1000);
@@ -73,12 +75,14 @@ void setup() {
     loopCounter = 0;
 }
 
-void loop() {
+void loop()
+{
     loopCounter++;
     endTime = millis();
 
     // Check if the update interval has passed
-    if (endTime - startTime >= updateInterval) {
+    if (endTime - startTime >= updateInterval)
+    {
         // Calculate the frame rate (loops per second)
         frameRate = (float)loopCounter / ((endTime - startTime) / 1000.0);
         // Reset the loop counter and start time for the next interval
@@ -90,15 +94,18 @@ void loop() {
     gpsLoop();
 }
 
-void gpsLoop() {
+void gpsLoop()
+{
     char c = GPS.read();
 
-    #ifdef HAS_DEBUG
-        debugWrite(c);
-    #endif
-    
-    if (GPS.newNMEAreceived() && GPS.parse(GPS.lastNMEA())) {
-        if (GPS.fix) {
+#ifdef HAS_DEBUG
+    debugWrite(c);
+#endif
+
+    if (GPS.newNMEAreceived() && GPS.parse(GPS.lastNMEA()))
+    {
+        if (GPS.fix)
+        {
             lapTimer.updateCurrentTime(getGpsTimeInMilliseconds());
             float altitude = GPS.altitude;
             float speed = GPS.speed;
@@ -107,16 +114,18 @@ void gpsLoop() {
     }
 }
 
-unsigned long getGpsTimeInMilliseconds() {
-  unsigned long timeInMillis = 0;
-  timeInMillis += GPS.hour * 3600000ULL;   // Convert hours to milliseconds
-  timeInMillis += GPS.minute * 60000ULL;   // Convert minutes to milliseconds
-  timeInMillis += GPS.seconds * 1000ULL;   // Convert seconds to milliseconds
-  timeInMillis += GPS.milliseconds;        // Add the milliseconds part
+unsigned long getGpsTimeInMilliseconds()
+{
+    unsigned long timeInMillis = 0;
+    timeInMillis += GPS.hour * 3600000ULL; // Convert hours to milliseconds
+    timeInMillis += GPS.minute * 60000ULL; // Convert minutes to milliseconds
+    timeInMillis += GPS.seconds * 1000ULL; // Convert seconds to milliseconds
+    timeInMillis += GPS.milliseconds;      // Add the milliseconds part
 
-  return timeInMillis;
+    return timeInMillis;
 }
 
-int getCurrentLap() {
+int getCurrentLap()
+{
     return lapTimer.getLaps();
 }
